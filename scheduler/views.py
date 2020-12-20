@@ -34,6 +34,7 @@ class SchedulerView(View):
         
         #バリデーションOKの場合、Trueが返ってくる。
         if formset.is_valid():
+            #モデルを継承して作ったformsのクラスの場合、.save()メソッドを使うことでDBに保存できる。
             formset.save()
         else:
             print("バリデーションエラー")
