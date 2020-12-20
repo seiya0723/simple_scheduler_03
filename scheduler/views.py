@@ -5,7 +5,7 @@ from django.views import View
 #models.pyで定義したSchedulerをimportする
 from .models import Scheduler
 
-from .forms import SchedulerForm
+from .forms import SchedulerForm,SchedulerDeleteForm
 
 
 #P35のビュー関数の書き方(関数ベース vs クラスベース)を参照。後の汎用性も考慮しクラスベースのビューを採用した。
@@ -51,8 +51,26 @@ class SchedulerDelete(View):
     def post(self ,request, *args, **kwargs):
 
         #削除対象のレコードをIDで一意に特定する。.delete()で削除
+        """
         posted  = Scheduler.objects.filter(id=request.POST["id"])
         posted.delete()
+        """
+
+        #バリデーションを行う
+        formset = SchedulerDeleteForm(request.POST)
+
+        #バリデーションが適切であれば削除処理、そうでなければエラー表示
+        if formset.is_valid():
+
+            #バリデーションした後の値を取り出す
+            clean_data  = formset.clean()
+
+            #filterで絞り込み、.delete()で削除処理をする。
+            Scheduler.objects.filter(id=clean_data["id"]).delete()
+
+        else:
+            print("バリデーションエラー")
+
 
         return redirect("scheduler:index")
    
